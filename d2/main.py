@@ -16,39 +16,17 @@ def read_ranges():
     return ranges
 
 
-def digit_count(n):
-    n = abs(n)
-    return 1 if n == 0 else int(math.log10(n)) + 1
-
-
-def find_invalid_ids(start: int, upper_bound: int):
-    current = start
-    cur_digit_count = digit_count(current)
-    if (cur_digit_count % 2) == 1:
-        current = int(math.pow(10, cur_digit_count))
-
-    current_str: string = str(current)
-    upper_str = current_str[0:len(current_str)//2]
-    upper = int(upper_str)
-    upper_doubled = int(upper_str + upper_str)
-
-    while upper_doubled < start:
-        upper += 1
-        upper_str = str(upper)
-        upper_doubled = int(upper_str + upper_str)
-
-    while upper_doubled <= upper_bound:
-        yield upper_doubled
-        upper += 1
-        upper_str = str(upper)
-        upper_doubled = int(upper_str + upper_str)
-
-
 if __name__ == "__main__":
     out = read_ranges()
     total = 0
     for start, upper_bound in out:
-        total += sum(find_invalid_ids(start, upper_bound))
-        for invalid_num in find_invalid_ids(start, upper_bound):
-            print(invalid_num)
-    print("total is", total)
+        for i in range(start, upper_bound + 1):
+            i_str = str(i)
+            for take_chars in range(1, len(i_str) // 2 + 1):
+                check = i_str[0:take_chars] * (len(i_str) // take_chars)
+                # print("Checking", i_str, "take_chars", take_chars, "check str", check)
+                if check == i_str:
+                    print("invalid id found:", i_str)
+                    total += i
+                    break
+    print(total)
