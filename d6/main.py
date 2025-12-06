@@ -1,4 +1,6 @@
 import sys
+from functools import reduce
+import re
 import math
 from intervaltree import IntervalTree
 from typing import Optional, List
@@ -9,33 +11,31 @@ def read_problems():
     filename = sys.argv[1]
 
     with open(filename) as f:
-        content = f.read().strip()
+        content = f.read()
 
-    lines = [[v.strip() for v in line.split()]
-             for line in content.splitlines()]
-    return [[int(v) for v in line] for line in lines[:-1]] + [lines[-1]]
+    lines = content.splitlines()
+    operands = lines[:-1]
+    operators = lines[-1]
+    print(operands, operators)
+
+    operator_idxs = [m.start() for m in re.finditer(
+        r"[+*]", operators)] + [len(operators) + 1]
+    for start, end in zip(operator_idxs, operator_idxs[1:]):
+        nums = []
+        for i in range(start, end - 1):
+            nums.append(int("".join([operands[c][i]
+                        for c in range(len(operands))])))
+        yield nums, operators[start]
 
 
 if __name__ == "__main__":
     problems = read_problems()
-    print(problems)
-
-    count_operands = len(problems) - 1
-    operator_idx = count_operands
-    count_problems = len(problems[0])
 
     results = []
 
-    for problem_idx in range(count_problems):
-        def op(a, b):
-            opc = problems[count_operands][problem_idx]
-            result = a + b if opc == '+' else a * b
-            print(a, opc, b, "=", result)
-            return result
-
-        total = problems[0][problem_idx]
-        for i in range(1, count_operands):
-            total = op(total, problems[i][problem_idx])
-        results.append(total)
+    for nums, op in problems:
+        print(nums, op)
+        op_lambda = (lambda a, b: a + b) if op == '+' else (lambda a, b: a*b)
+        results.append(reduce(op_lambda, nums))
 
     print(sum(results))
