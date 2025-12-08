@@ -30,7 +30,9 @@ if __name__ == "__main__":
     min_pairs = [(x[0], x[1], math.dist(
         points[x[0]], points[x[1]])) for x in min_pairs]
     min_pairs.sort(key=lambda x: x[2])
-    min_pairs = min_pairs[:1000]
+    # Found 5206 by trying out different numbers and checking when there is
+    # only one component of size 1000 # is printed
+    min_pairs = min_pairs[:5206]
     print(min_pairs)
 
     G = nx.Graph()
@@ -39,3 +41,5 @@ if __name__ == "__main__":
     components = list(nx.connected_components(G))
     print(components)
     print((sorted([len(c) for c in components], reverse=True)[:3]))
+    box_1, box_2, _ = min_pairs[-1]
+    print(points[box_1], points[box_2])
